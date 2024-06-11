@@ -23,9 +23,15 @@ Notifikace: SMS nebo emailové notifikace o nadcházejících schůzkách.
 
 Technologie:
 
-Frontend: Angular nebo React
-Backend: Node.js, Express
-Databáze: PostgreSQL nebo MongoDB
-Notifikace: Twilio pro SMS, Nodemailer pro emaily
-Hosting: Google Cloud nebo AWS
-Autentizace: JWT, role-based access control
+Frontend: 
+Angular nebo React
+Backend: 
+Node.js, Express
+Databáze: 
+PostgreSQL nebo MongoDB
+Notifikace: 
+Twilio pro SMS, Nodemailer pro emaily
+Hosting: 
+Google Cloud nebo AWS
+Autentizace: 
+JWT, role-based access control
