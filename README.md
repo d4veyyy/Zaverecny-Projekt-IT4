@@ -23,14 +23,14 @@ Notifikace: SMS nebo emailové notifikace o nadcházejících schůzkách.
 
 Technologie:
 
-Frontend: Angular nebo React
+Frontend: Bootstrap
 
-Backend: Node.js, Express
+Backend: Node.js, Django
 
-Databáze: PostgreSQL nebo MongoDB
+Databáze: MYSQL nebo MariaDB
 
-Notifikace: Twilio pro SMS, Nodemailer pro emaily
+Notifikace: MessageBird pro SMS, Nodemailer pro emaily
 
-Hosting: Google Cloud nebo AWS
+Hosting: Microsoft Azure
 
 Autentizace: JWT, role-based access control
