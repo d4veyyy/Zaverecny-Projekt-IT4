@@ -28,6 +28,18 @@ Tato webová aplikace je určena pro **správu skladových zásob** a umožňuje
 - **Django Templating Engine**: Generování HTML šablon s dynamickými daty.
 - **Bootstrap**: Pro moderní responzivní design a lepší UX/UI.
 
+- ## Funkce
+
+- **Přidávání produktů**: Administrátoři mohou přidávat nové produkty s detaily jako název, popis, cena a množství na skladě.
+- **Aktualizace a mazání**: Možnost editovat informace o produktu nebo jej odstranit.
+- **Seznam produktů**: Přehled všech dostupných produktů na skladě s možností filtrování a vyhledávání.
+- **Detail produktu**: Zobrazení podrobností o konkrétní položce ve skladu.
+- **Sledování zásob**: Automatická upozornění, pokud některé položky klesnou pod stanovený limit.
+- **Uživatelská autentizace**: Přihlášení, registrace a správa uživatelských rolí (administrátor, skladník).
+- **Příjem a výdej zboží**: Umožňuje zaznamenávat pohyb zboží do skladu i ven.
+- **Historie operací**: Udržuje záznam o všech skladových operacích, což usnadňuje dohledání pohybů zboží.
+- **Upozornění na nedostatek**: Systém varuje, pokud skladové zásoby klesnou pod určitou předdefinovanou hodnotu.
+
 ## Struktura projektu
 
 ```plaintext
@@ -43,15 +55,4 @@ root
 ├── db.sqlite3          # Databáze SQLite (pro skladová data)
 └── manage.py           # Hlavní soubor pro správu aplikace Django
 
-## Funkce
-
-- **Přidávání produktů**: Administrátoři mohou přidávat nové produkty s detaily jako název, popis, cena a množství na skladě.
-- **Aktualizace a mazání**: Možnost editovat informace o produktu nebo jej odstranit.
-- **Seznam produktů**: Přehled všech dostupných produktů na skladě s možností filtrování a vyhledávání.
-- **Detail produktu**: Zobrazení podrobností o konkrétní položce ve skladu.
-- **Sledování zásob**: Automatická upozornění, pokud některé položky klesnou pod stanovený limit.
-- **Uživatelská autentizace**: Přihlášení, registrace a správa uživatelských rolí (administrátor, skladník).
-- **Příjem a výdej zboží**: Umožňuje zaznamenávat pohyb zboží do skladu i ven.
-- **Historie operací**: Udržuje záznam o všech skladových operacích, což usnadňuje dohledání pohybů zboží.
-- **Upozornění na nedostatek**: Systém varuje, pokud skladové zásoby klesnou pod určitou předdefinovanou hodnotu.
 
