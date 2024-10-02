@@ -39,16 +39,16 @@ Struktura projektu
 plaintext
 
 root
-├── sklad               # Hlavní aplikace pro správu skladu                                                                                                                                                                   
-│   ├── templates       # HTML šablony
-│   │   └── sklad       # Šablony pro různé stránky (index, detail, formuláře, atd.)
-│   ├── static          # CSS, JavaScript a obrázky
-│   ├── views.py        # Logika pro jednotlivé stránky a operace
-│   ├── models.py       # Datové modely pro skladové položky
-│   ├── urls.py         # Definice URL tras
-│   └── forms.py        # Formuláře pro přidávání/úpravu produktů
-├── db.sqlite3          # Databáze SQLite (pro skladová data)
-└── manage.py           # Hlavní soubor pro správu aplikace Django
+   ├── sklad               # Hlavní aplikace pro správu skladu                                                                                                                                                                   
+  │   ├── templates       # HTML šablony
+  │   │   └── sklad       # Šablony pro různé stránky (index, detail, formuláře, atd.)
+  │   ├── static          # CSS, JavaScript a obrázky
+  │   ├── views.py        # Logika pro jednotlivé stránky a operace
+  │   ├── models.py       # Datové modely pro skladové položky
+  │   ├── urls.py         # Definice URL tras
+  │   └── forms.py        # Formuláře pro přidávání/úpravu produktů
+   ├── db.sqlite3          # Databáze SQLite (pro skladová data)
+  └── manage.py           # Hlavní soubor pro správu aplikace Django
 
 Funkce
  
