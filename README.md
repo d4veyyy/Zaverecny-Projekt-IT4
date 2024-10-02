@@ -33,22 +33,12 @@ Django: Webový framework pro správu serverových operací, šablon a datové l
 SQLite (výchozí databáze Django): Používána pro ukládání dat skladových položek a uživatelských účtů.
 
 Další technologie:
+
 Django Templating Engine: Generování HTML šablon s dynamickými daty.
 Bootstrap (nepovinně): Pro moderní responzivní design a lepší UX/UI.
 Struktura projektu
 plaintext
 
-root
-   ├── sklad               # Hlavní aplikace pro správu skladu                                                                                                                                                                   
-  │   ├── templates       # HTML šablony
-  │   │   └── sklad       # Šablony pro různé stránky (index, detail, formuláře, atd.)
-  │   ├── static          # CSS, JavaScript a obrázky
-  │   ├── views.py        # Logika pro jednotlivé stránky a operace
-  │   ├── models.py       # Datové modely pro skladové položky
-  │   ├── urls.py         # Definice URL tras
-  │   └── forms.py        # Formuláře pro přidávání/úpravu produktů
-   ├── db.sqlite3          # Databáze SQLite (pro skladová data)
-  └── manage.py           # Hlavní soubor pro správu aplikace Django
 
 Funkce
  
