@@ -26,7 +26,7 @@ Tato webová aplikace je určena pro **správu skladových zásob** a umožňuje
 
 ### Další technologie:
 - **Django Templating Engine**: Generování HTML šablon s dynamickými daty.
-- **Bootstrap** (nepovinně): Pro moderní responzivní design a lepší UX/UI.
+- **Bootstrap**: Pro moderní responzivní design a lepší UX/UI.
 
 ## Struktura projektu
 
