@@ -39,7 +39,7 @@ Struktura projektu
 plaintext
 
 root
-├── sklad               # Hlavní aplikace pro správu skladu
+├── sklad               # Hlavní aplikace pro správu skladu                                                                                                                                                                   
 │   ├── templates       # HTML šablony
 │   │   └── sklad       # Šablony pro různé stránky (index, detail, formuláře, atd.)
 │   ├── static          # CSS, JavaScript a obrázky
