@@ -28,7 +28,7 @@ Tato webová aplikace je určena pro **správu skladových zásob** a umožňuje
 - **Django Templating Engine**: Generování HTML šablon s dynamickými daty.
 - **Bootstrap**: Pro moderní responzivní design a lepší UX/UI.
 
-- ## Funkce
+### Funkce
 
 - **Přidávání produktů**: Administrátoři mohou přidávat nové produkty s detaily jako název, popis, cena a množství na skladě.
 - **Aktualizace a mazání**: Možnost editovat informace o produktu nebo jej odstranit.
