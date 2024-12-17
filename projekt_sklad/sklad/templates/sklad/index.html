@@ -1,0 +1,10 @@
+{% extends 'sklad/base.html' %}
+{% block content %}
+    <h1>Seznam produktů</h1>
+    <ul>
+        {% for produkt in produkty %}
+            <li>{{ produkt.nazev }} - Množství: {{ produkt.mnozstvi }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'pridat_produkt' %}" class="btn btn-primary">Přidat produkt</a>
+{% endblock %}
