@@ -23,15 +23,14 @@ class ProfilUzivatele(models.Model):
     def __str__(self):
         return self.user.username
 
+from django.contrib.auth.models import User
+
 class HistorieOperaci(models.Model):
     produkt = models.ForeignKey(Produkt, on_delete=models.CASCADE)
-    uzivatel = models.ForeignKey('self', on_delete=models.CASCADE)
+    uzivatel = models.ForeignKey(User, on_delete=models.CASCADE)  # Odkaz na uživatele
     datum = models.DateTimeField(auto_now_add=True)
     typ_operace = models.CharField(max_length=10, choices=[('příjem', 'Příjem'), ('výdej', 'Výdej')])
     mnozstvi = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.typ_operace} - {self.produkt.nazev}"
-
-    def __str__(self):
-        return f"{self.typ} - {self.uzivatel.username}"
+        return f"{self.typ_operace} - {self.produkt.nazev} - {self.uzivatel.username if self.uzivatel else 'Nepřiřazen'}"
