@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sklad - Správa produktů</title>
+
+    <!-- Odkaz na Bootstrap CSS z CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Hlavní navigační lišta -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Sklad</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">Domů</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pridat/">Přidat produkt</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hlavní obsah stránky -->
+    <main class="container mt-4">
+        <div class="row">
+            <!-- Tady se načítají produkty (pokud existují) -->
+            {% block content %}
+            <!-- Ukázka karet pro produkty -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Produkt">
+                    <div class="card-body">
+                        <h5 class="card-title">Produkt název</h5>
+                        <p class="card-text">Popis produktu. Rychlý přehled o produktu a jeho vlastnostech.</p>
+                        <a href="#" class="btn btn-primary">Detail</a>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light py-3 mt-4">
+        <div class="container text-center">
+            <p class="mb-0">© 2024 Sklad - Správa produktů</p>
+        </div>
+    </footer>
+
+    <!-- Odkaz na Bootstrap JavaScript z CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+    <h1>Seznam produktů</h1>
+    
+    <div class="container">
+        <!-- Zkontrolujeme, zda jsou produkty k dispozici -->
+        {% if produkty %}
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Název produktu</th>
+                        <th>Cena</th>
+                        <th>Popis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produkt in produkty %}
+                        <tr>
+                            <td>{{ produkt.nazev }}</td>
+                            <td>{{ produkt.cena }}</td>
+                            <td>{{ produkt.popis }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Žádné produkty nejsou k dispozici.</p>
+        {% endif %}
+        
+        <!-- Tlačítko pro přidání nového produktu -->
+        <a href="{% url 'produkty' %}" class="btn btn-primary">Přidat nový produkt</a>
+
+    </div>
+{% endblock %}

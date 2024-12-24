@@ -1,0 +1,55 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Detail produktu</h1>
+    <table class="table">
+        <tr>
+            <th>Název:</th>
+            <td>{{ produkt.nazev }}</td>
+        </tr>
+        <tr>
+            <th>Popis:</th>
+            <td>{{ produkt.popis|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Cena:</th>
+            <td>{{ produkt.cena }}</td>
+        </tr>
+        <tr>
+            <th>Celkové množství:</th>
+            <td>{{ produkt.celkem_mnozstvi|default:0 }}</td>
+        </tr>
+        <tr>
+            <th>Poslední uživatel:</th>
+            <td>{{ produkt.posledni_uzivatel|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <h2>Historie operací pro tento produkt</h2>
+    {% if produkt.historieoperaci_set.all %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Typ operace</th>
+                    <th>Množství</th>
+                    <th>Uživatel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for operace in produkt.historieoperaci_set.all %}
+                    <tr>
+                        <td>{{ operace.datum|date:"d.m.Y H:i" }}</td>
+                        <td>{{ operace.typ_operace }}</td>
+                        <td>{{ operace.mnozstvi }}</td>
+                        <td>{{ operace.uzivatel.username }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Pro tento produkt zatím nejsou žádné operace.</p>
+    {% endif %}
+</div>
+{% endblock %}
