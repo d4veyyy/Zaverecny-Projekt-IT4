@@ -1,0 +1,22 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Odebrat historii operací</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="historie_id" class="form-label">Vyberte záznam k odebrání:</label>
+            <select name="historie_id" id="historie_id" class="form-select">
+                {% for operace in historie %}
+                    <option value="{{ operace.id }}">
+                        {{ operace.produkt.nazev }} - {{ operace.uzivatel.username }} - {{ operace.datum|date:"d.m.Y H:i" }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-danger">Odebrat</button>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Zpět</a>
+    </form>
+</div>
+{% endblock %}

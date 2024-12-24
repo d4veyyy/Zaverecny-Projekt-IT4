@@ -1,62 +1,77 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-    <div class="container">
-        <h1>Přehled produktů</h1>
-        {% if produkty %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Název</th>
-                        <th>Popis</th>
-                        <th>Cena</th>
-                        <th>Celkové množství</th>
-                        <th>Poslední uživatel</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for produkt in produkty %}
-                        <tr>
-                            <td>{{ produkt.nazev }}</td>
-                            <td>{{ produkt.popis }}</td>
-                            <td>{{ produkt.cena }}</td>
-                            <td>{{ produkt.celkem_mnozstvi|default:0 }}</td>
-                            <td>{{ produkt.posledni_uzivatel|default:"-" }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Žádné produkty nejsou k dispozici.</p>
-        {% endif %}
-
-        <h2>Historie operací</h2>
-        {% if historie %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Produkt</th>
-                        <th>Uživatel</th>
-                        <th>Datum</th>
-                        <th>Typ operace</th>
-                        <th>Množství</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for operace in historie %}
-                        <tr>
-                            <td>{{ operace.produkt.nazev }}</td>
-                            <td>{{ operace.uzivatel.username }}</td>
-                            <td>{{ operace.datum }}</td>
-                            <td>{{ operace.typ_operace }}</td>
-                            <td>{{ operace.mnozstvi }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>Žádné operace nejsou k dispozici.</p>
-        {% endif %}
+<div class="container">
+    <h1>Přehled produktů</h1>
+    <div class="mb-3">
+        <!-- Tlačítka pro přidání a odebrání produktů -->
+        <a href="{% url 'pridat_produkt' %}" class="btn btn-primary">Přidat produkty</a>
+        <a href="{% url 'odebrat_produkty' %}" class="btn btn-danger">Odebrat produkty</a>
     </div>
-{% endblock %}
+    {% if produkty %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Název</th>
+                    <th>Popis</th>
+                    <th>Cena</th>
+                    <th>Celkové množství</th>
+                    <th>Poslední uživatel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produkt in produkty %}
+                    <tr>
+                        <td>{{ produkt.nazev }}</td>
+                        <td>{{ produkt.popis }}</td>
+                        <td>{{ produkt.cena }}</td>
+                        <td>{{ produkt.mnozstvi }}</td>
+                        <td>
+                            {% if produkt.uzivatel %}
+                                {{ produkt.uzivatel.username }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Žádné produkty nejsou k dispozici.</p>
+    {% endif %}
+</div>
 
+     <h2>Historie operací</h2>
+    <div class="mb-3">
+        <!-- Tlačítka pro přidání a odebrání historie operací -->
+        <a href="{% url 'pridat_historii' %}" class="btn btn-primary">Přidat historii operací</a>
+        <a href="{% url 'odebrat_historii' %}" class="btn btn-danger">Odebrat historii operací</a>
+    </div>
+    {% if historie %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produkt</th>
+                    <th>Uživatel</th>
+                    <th>Datum</th>
+                    <th>Typ operace</th>
+                    <th>Množství</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for operace in historie %}
+                    <tr>
+                        <td>{{ operace.produkt.nazev }}</td>
+                        <td>{{ operace.uzivatel.username }}</td>
+                        <td>{{ operace.datum|date:"d.m.Y H:i" }}</td>
+                        <td>{{ operace.typ_operace }}</td>
+                        <td>{{ operace.mnozstvi }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Žádné operace nejsou k dispozici.</p>
+    {% endif %}
+{% endblock %}

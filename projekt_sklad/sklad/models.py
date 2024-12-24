@@ -7,7 +7,7 @@ class Produkt(models.Model):
     cena = models.DecimalField(max_digits=10, decimal_places=2)
     mnozstvi = models.PositiveIntegerField()
     min_zasoba = models.PositiveIntegerField(default=0)
-
+    uzivatel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)  # Cizí klíč na uživatele
 
     def je_nedostatek(self):
         return self.mnozstvi >= self.min_zasoba
