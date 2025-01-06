@@ -1,0 +1,22 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Odebrat všechny produkty</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <p>Opravdu chcete smazat všechny produkty? Tato akce je nevratná!</p>
+        <button type="submit" class="btn btn-danger">Ano, smazat všechny produkty</button>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Zrušit</a>
+    </form>
+
+    <h3>Seznam produktů k smazání:</h3>
+    <ul>
+        {% for produkt in produkty %}
+        <li>{{ produkt.nazev }} ({{ produkt.mnozstvi }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+

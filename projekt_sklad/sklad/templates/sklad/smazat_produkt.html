@@ -1,0 +1,13 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Potvrzení smazání produktu</h1>
+  <form method="POST">
+    {% csrf_token %}
+    <p>Opravdu chcete smazat produkt {{ produkt.nazev }}?</p>
+    <button type="submit" class="btn btn-danger">Ano, smazat</button>
+    <a href="{% url 'index' %}" class="btn btn-secondary">Zrušit</a>
+  </form>
+</div>
+{% endblock %}

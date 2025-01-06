@@ -1,0 +1,22 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Odebrat historii operací</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <p>Opravdu chcete odebrat všechny záznamy v historii operací? Tato akce je nevratná!</p>
+        <button type="submit" class="btn btn-danger">Ano, odebrat všechny záznamy</button>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Zrušit</a>
+    </form>
+
+    <h3>Seznam všech operací:</h3>
+    <ul>
+        {% for operace in historie %}
+        <li>{{ operace.datum|date:"d.m.Y H:i" }} - {{ operace.produkt_nazev }} - {{ operace.typ_operace }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+

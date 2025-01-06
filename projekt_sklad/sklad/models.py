@@ -15,6 +15,21 @@ class Produkt(models.Model):
     def __str__(self):
         return self.nazev
 
+class HistorieOperaci(models.Model):
+    produkt = models.ForeignKey(Produkt, on_delete=models.SET_NULL, null=True, blank=True)
+    produkt_nazev = models.CharField(max_length=200, blank=True, null=True)
+    uzivatel = models.ForeignKey(User, on_delete=models.CASCADE)
+    datum = models.DateTimeField(auto_now_add=True)
+    typ_operace = models.CharField(max_length=10, choices=[('příjem', 'Příjem'), ('výdej', 'Výdej')])
+    mnozstvi = models.PositiveIntegerField()
+
+    def save(self, *args, **kwargs):
+        if self.produkt and not self.produkt_nazev:
+            self.produkt_nazev = self.produkt.nazev
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.typ_operace} - {self.produkt_nazev if self.produkt_nazev else 'Produkt smazán'} - {self.uzivatel.username}"
 class ProfilUzivatele(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     telefon = models.CharField(max_length=15, blank=True)
@@ -25,12 +40,3 @@ class ProfilUzivatele(models.Model):
 
 from django.contrib.auth.models import User
 
-class HistorieOperaci(models.Model):
-    produkt = models.ForeignKey(Produkt, on_delete=models.CASCADE)
-    uzivatel = models.ForeignKey(User, on_delete=models.CASCADE)  # Odkaz na uživatele
-    datum = models.DateTimeField(auto_now_add=True)
-    typ_operace = models.CharField(max_length=10, choices=[('příjem', 'Příjem'), ('výdej', 'Výdej')])
-    mnozstvi = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.typ_operace} - {self.produkt.nazev} - {self.uzivatel.username if self.uzivatel else 'Nepřiřazen'}"

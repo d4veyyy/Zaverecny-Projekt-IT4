@@ -3,9 +3,10 @@ from .models import Produkt, HistorieOperaci
 from .forms import ProduktForm, HistorieOperaciForm
 from django.db.models import Exists, OuterRef
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.http import Http404
+from django.contrib import messages
 
-
+@login_required
 def index(request):
     # Všechny produkty
     produkty = Produkt.objects.annotate(
@@ -33,33 +34,86 @@ def detail_produktu(request, id):
     # Vrátíme detail produktu do šablony
     return render(request, 'sklad/detail.html', {'produkt': produkt})
 
+def upravit_produkt(request, id):
+    produkt = Produkt.objects.get(id=id)
+    if request.method == 'POST':
+        form = ProduktForm(request.POST, instance=produkt)
+        if form.is_valid():
+            upravene_mnozstvi = form.cleaned_data['mnozstvi'] - produkt.mnozstvi
+            produkt = form.save()
+
+            # Záznam historie pro upravené množství
+            HistorieOperaci.objects.create(
+                produkt=produkt,
+                uzivatel=request.user,
+                typ_operace='příjem' if upravene_mnozstvi > 0 else 'výdej',
+                mnozstvi=abs(upravene_mnozstvi),
+                produkt_nazev=produkt.nazev
+            )
+
+            return redirect('produkty')
+    else:
+        form = ProduktForm(instance=produkt)
+
+    return render(request, 'sklad/upravit_produkt.html', {'form': form, 'produkt': produkt})
+
 
 
 def pridat_produkt(request):
     if request.method == 'POST':
         form = ProduktForm(request.POST)
         if form.is_valid():
-            # Uložení produktu a automatické přiřazení uživatele
-            produkt = form.save(commit=False)  # Neposíláme ještě do DB
-            produkt.uzivatel = request.user  # Přiřazení přihlášeného uživatele
-            produkt.save()  # Uložení produktu do DB
+            produkt = form.save(commit=False)
+            produkt.uzivatel = request.user  # Nastavení aktuálního uživatele
+            produkt.save()
 
-            # Vytvoření historie operace pro tento produkt
+            # Debugovací výstupy
+            print("Ukládám produkt:", produkt.nazev)
+            print("Množství produktu:", produkt.mnozstvi)
+
+            # Automatické vytvoření historie operací
             HistorieOperaci.objects.create(
                 produkt=produkt,
                 uzivatel=request.user,
                 typ_operace='příjem',
-                mnozstvi=10
+                mnozstvi=produkt.mnozstvi,
+                produkt_nazev=produkt.nazev
             )
 
-            # Přesměrování na hlavní stránku
+            print("Historie operací byla vytvořena.")
+
             return redirect('index')
     else:
-        form = ProduktForm()  # Inicializace prázdného formuláře
-
-    # Vrácení formuláře do šablony
+        form = ProduktForm()
     return render(request, 'sklad/pridat_produkt.html', {'form': form})
 
+def smazat_produkt(request, id):
+    try:
+        produkt = Produkt.objects.get(id=id)
+    except Produkt.DoesNotExist:
+        raise Http404("Produkt nebyl nalezen")
+
+    if request.method == 'POST':
+        # Uložení historie operace před smazáním produktu
+        historie = HistorieOperaci.objects.create(
+            produkt=produkt,
+            uzivatel=request.user,
+            typ_operace='výdej',  # Změněno na "výdej"
+            mnozstvi=produkt.mnozstvi,
+            produkt_nazev=produkt.nazev
+        )
+
+        # Debugging: Zkontrolujte, že historie byla vytvořena
+        print(f"Historie operace byla vytvořena: {historie}")
+
+        # Smazání produktu
+        produkt.delete()
+
+        # Přesměrování na hlavní stránku po úspěšném smazání
+        messages.success(request, f"Produkt {produkt.nazev} byl úspěšně smazán.")
+        return redirect('/')
+
+    return render(request, 'sklad/smazat_produkt.html', {'produkt': produkt})
 
 def historie_operaci(request):
     # Načteme všechny operace z historie
@@ -76,19 +130,6 @@ def produkty(request):
     # Vrátíme produkty do šablony
     return render(request, 'sklad/produkty.html', {'produkty': produkty})
 
-
-@login_required
-def pridat_produkt(request):
-    if request.method == 'POST':
-        form = ProduktForm(request.POST)
-        if form.is_valid():
-            produkt = form.save(commit=False)
-            produkt.uzivatel = request.user  # Přiřazení přihlášeného uživatele
-            produkt.save()
-            return redirect('produkty')  # Přesměrování na seznam produktů
-    else:
-        form = ProduktForm()
-    return render(request, 'sklad/pridat_produkt.html', {'form': form})
 def pridat_historii(request):
     if request.method == 'POST':
         form = HistorieOperaciForm(request.POST)
@@ -103,20 +144,46 @@ def pridat_historii(request):
 
 def odebrat_produkty(request):
     if request.method == 'POST':
-        produkt_id = request.POST.get('produkt_id')
-        produkt = get_object_or_404(Produkt, id=produkt_id)
-        produkt.delete()  # Smazání produktu
-        return redirect('index')  # Přesměrování na hlavní stránku
+        # Získání všech produktů
+        produkty = Produkt.objects.all()
 
-    produkty = Produkt.objects.all()  # Získání všech produktů
-    return render(request, 'sklad/odebrat_produkt.html', {'produkty': produkty})
+        # Uložení historie operace pro každý produkt
+        for produkt in produkty:
+            HistorieOperaci.objects.create(
+                produkt=produkt,
+                uzivatel=request.user,
+                typ_operace='smazání',  # Pokud chcete označit jako 'smazání'
+                mnozstvi=produkt.mnozstvi,
+                produkt_nazev=produkt.nazev
+            )
 
-def odebrat_historii(request):
+        # Smazání všech produktů
+        produkty.delete()
+
+        # Informování uživatele o úspěchu
+        messages.success(request, "Všechny produkty byly úspěšně smazány.")
+        return redirect('index')  # Přesměrování na hlavní stránku nebo jinou dle vašeho výběru
+
+    produkty = Produkt.objects.all()  # Získání všech produktů pro případ, že chcete zobrazit seznam
+    return render(request, 'sklad/odebrat_produkty.html', {'produkty': produkty})
+
+def odebrat_operace(request):
     if request.method == 'POST':
-        historie_id = request.POST.get('historie_id')
-        operace = get_object_or_404(HistorieOperaci, id=historie_id)
-        operace.delete()  # Smazání vybrané historie operace
+        # Získání všech záznamů historie
+        historie = HistorieOperaci.objects.all()
+
+        # Uložení do historie operací před smazáním
+        HistorieOperaci.objects.create(
+            uzivatel=request.user,
+            typ_operace='odebrání historie',
+            produkt_nazev="Všechny operace",
+            mnozstvi=len(historie)  # Počet smazaných operací
+        )
+
+        # Smazání všech záznamů v historii
+        historie.delete()
+
+        messages.success(request, "Všechny záznamy v historii operací byly úspěšně smazány.")
         return redirect('index')  # Přesměrování na hlavní stránku
 
-    historie = HistorieOperaci.objects.all()  # Načtení všech záznamů historie
-    return render(request, 'sklad/odebrat_historii.html', {'historie': historie})
+    return render(request, 'sklad/odebrat_operace.html')

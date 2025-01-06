@@ -4,7 +4,7 @@ from .models import Produkt, HistorieOperaci
 class ProduktForm(forms.ModelForm):
     class Meta:
         model = Produkt
-        fields = ['nazev', 'popis', 'cena', 'mnozstvi', 'uzivatel']  # Uživatele nebudeme vybírat, přidáme ho automaticky
+        fields = ['nazev', 'popis', 'cena', 'mnozstvi', 'min_zasoba', 'uzivatel']  # Uživatele nebudeme vybírat, přidáme ho automaticky
 
     def save(self, commit=True):
         produkt = super().save(commit=False)
