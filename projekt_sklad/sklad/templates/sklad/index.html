@@ -1,77 +1,153 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-<div class="container">
-    <h1>Přehled produktů</h1>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Přehled Produktů</h1>
     <div class="mb-3">
         <!-- Tlačítka pro přidání a odebrání produktů -->
-        <a href="{% url 'pridat_produkty' %}" class="btn btn-primary">Přidat produkty</a>
+        <a href="{% url 'pridat_produkty' %}" class="btn btn-primary">Přidat produkt</a>
         <a href="{% url 'odebrat_produkty' %}" class="btn btn-danger">Odebrat produkty</a>
     </div>
+
     {% if produkty %}
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Název</th>
-            <th>Popis</th>
-            <th>Množství</th>
-            <th>Poslední uživatel</th>
-            <th>Akce</th>  <!-- Sloupec pro akce, například smazání -->
-        </tr>
-        </thead>
-        <tbody>
-        {% for produkt in produkty %}
-        <tr>
-            <td>{{ produkt.nazev }}</td>
-            <td>{{ produkt.popis }}</td>
-            <td>{{ produkt.mnozstvi }}</td>
-            <td>
-                {% if produkt.uzivatel %}
-                {{ produkt.uzivatel.username }}
-                {% else %}
-                -
-                {% endif %}
-            </td>
-            <td>
-                <!-- Odkaz na smazání produktu -->
-                <a href="{% url 'smazat_produkt' produkt.id %}" class="btn btn-danger btn-sm">Smazat</a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Název</th>
+                    <th>Popis</th>
+                    <th>Množství</th>
+                    <th>Cena</th> <!-- Přidán sloupec pro cenu -->
+                    <th>Přidal</th>
+                    <th>Stav</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for produkt in produkty %}
+            <tr>
+                <td>{{ produkt.nazev }}</td>
+                <td>{{ produkt.popis }}</td>
+                <td>{{ produkt.mnozstvi }}</td>
+                <td>{{ produkt.cena }} Kč</td> <!-- Zobrazení ceny -->
+                <td>
+                    {% if produkt.uzivatel %}
+                    {{ produkt.uzivatel.username }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if produkt.mnozstvi > 0 %}
+                    <span class="badge skladem">Skladem</span>
+                    {% else %}
+                    <span class="badge neni-skladem">Není skladem</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'smazat_produkt' produkt.id %}" class="btn btn-danger btn-sm">Smazat</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-    <p>Žádné produkty nejsou k dispozici.</p>
+    <p class="text-center">Žádné produkty nejsou k dispozici.</p>
     {% endif %}
 
-    <h2>Historie operací</h2>
+    <h2 class="text-center mb-4">Přehled Historie</h2>
     <a href="{% url 'odebrat_operace' %}" class="btn btn-warning">Odebrat historii</a>
+
     {% if historie %}
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Datum</th>
-            <th>Produkt</th>
-            <th>Uživatel</th>
-            <th>Typ operace</th>
-            <th>Množství</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for operace in historie %}
-        <tr>
-            <td>{{ operace.datum|date:"d.m.Y H:i" }}</td>
-            <td>{{ operace.produkt_nazev }}</td>
-            <td>{{ operace.uzivatel.username }}</td>
-            <td>{{ operace.typ_operace }}</td>
-            <td>{{ operace.mnozstvi }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive mt-3">
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Datum</th>
+                    <th>Produkt</th>
+                    <th>Uživatel</th>
+                    <th>Typ operace</th>
+                    <th>Množství</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for operace in historie %}
+            <tr>
+                <td>{{ operace.datum|date:"d.m.Y H:i" }}</td>
+                <td>{{ operace.produkt_nazev }}</td>
+                <td>{{ operace.uzivatel.username }}</td>
+                <td>{{ operace.typ_operace }}</td>
+                <td>{{ operace.mnozstvi }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-    <p>Žádné operace nejsou k dispozici.</p>
+    <p class="text-center">Žádné operace nejsou k dispozici.</p>
     {% endif %}
 </div>
-{% endblock %}
 
+<style>
+    /* Styling pro Stav skladem a Není skladem */
+    .skladem {
+        background-color: #28a745;  /* Zelená barva */
+        color: white;
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+
+    .neni-skladem {
+        background-color: #dc3545;  /* Červená barva */
+        color: white;
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+
+    /* Styling pro tlačítka */
+    .btn-primary {
+        background-color: #58aa60;
+        border-color: #000000;
+        color: black;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #000000;
+    }
+
+    .btn-warning {
+        background-color: #ff0000;
+        border-color: #000000;
+        color: #ffffff;
+    }
+
+    /* Vylepšený design tabulky */
+    table {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    th, td {
+        text-align: center;
+    }
+
+    th {
+        color: #000000;
+    }
+
+    tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #e9ecef;
+    }
+</style>
+
+{% endblock %}

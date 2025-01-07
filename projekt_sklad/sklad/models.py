@@ -9,8 +9,12 @@ class Produkt(models.Model):
     min_zasoba = models.PositiveIntegerField(default=0)
     uzivatel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)  # Cizí klíč na uživatele
 
-    def je_nedostatek(self):
-        return self.mnozstvi >= self.min_zasoba
+    def aktualizovat_stav(self):
+        if self.mnozstvi > 0:
+            self.stav = 'Skladem'
+        else:
+            self.stav = 'Není skladem'
+        self.save()
 
     def __str__(self):
         return self.nazev
@@ -38,5 +42,5 @@ class ProfilUzivatele(models.Model):
     def __str__(self):
         return self.user.username
 
-from django.contrib.auth.models import User
+
 

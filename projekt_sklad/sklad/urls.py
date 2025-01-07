@@ -15,5 +15,7 @@ urlpatterns = [
     path('odebrat-operace/', views.odebrat_operace, name='odebrat_operace'),
     path('accounts/login/', LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('smazat_produkt/<int:id>/', views.smazat_produkt, name='smazat_produkt'),
+    path('produkty_skladem/', views.produkty_skladem, name='produkty_skladem'),
+    path('pridat_mnozstvi/<int:produkt_id>/', views.pridat_mnozstvi, name='pridat_mnozstvi'),
 ]
 

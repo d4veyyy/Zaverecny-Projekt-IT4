@@ -87,6 +87,51 @@ def pridat_produkt(request):
         form = ProduktForm()
     return render(request, 'sklad/pridat_produkt.html', {'form': form})
 
+def produkty_skladem(request):
+    produkty = Produkt.objects.all()  # Získání všech produktů
+
+    if request.method == 'POST':
+        produkt_id = request.POST.get('produkt_id')
+        mnozstvi = int(request.POST.get('mnozstvi', 0))  # Získání zadaného množství
+        produkt = get_object_or_404(Produkt, id=produkt_id)
+
+        # Aktualizace množství
+        produkt.mnozstvi += mnozstvi
+        produkt.save()
+
+        # Zpráva o úspěšné aktualizaci
+        messages.success(request, f"Produkt {produkt.nazev} byl aktualizován. Nové množství: {produkt.mnozstvi}.")
+        return redirect('produkty_skladem')
+
+    return render(request, 'sklad/produkty_skladem.html', {'produkty': produkty})
+
+
+def pridat_mnozstvi(request, produkt_id):
+    # Získání produktu podle ID
+    produkt = get_object_or_404(Produkt, id=produkt_id)
+
+    if request.method == 'POST':
+        # Zvýšení množství o 1
+        produkt.mnozstvi += 1
+        produkt.save()  # Uložení změny množství produktu
+
+        # Zjištění přihlášeného uživatele, pokud je přihlášen
+        uzivatel = request.user if request.user.is_authenticated else None
+
+        # Zapsání operace do historie jako příjem
+        HistorieOperaci.objects.create(
+            produkt=produkt,  # Odkaz na produkt
+            typ_operace='příjem',  # Typ operace - Příjem
+            mnozstvi=1,  # Příjem o 1 kus
+            uzivatel=uzivatel  # Pokud je přihlášený uživatel, použij ho
+        )
+
+        # Přidání zprávy o úspěchu
+        messages.success(request, f'Bylo přidáno množství k produktu: {produkt.nazev}')
+
+    # Přesměrování zpět na stránku produktů skladem
+    return redirect('produkty_skladem')  # Tady se ujistíme, že jdeš zpět na správnou stránku
+
 def smazat_produkt(request, id):
     try:
         produkt = Produkt.objects.get(id=id)
@@ -94,7 +139,7 @@ def smazat_produkt(request, id):
         raise Http404("Produkt nebyl nalezen")
 
     if request.method == 'POST':
-        # Uložení historie operace před smazáním produktu
+        # Uložení historie operace před úpravou produktu
         historie = HistorieOperaci.objects.create(
             produkt=produkt,
             uzivatel=request.user,
@@ -106,11 +151,12 @@ def smazat_produkt(request, id):
         # Debugging: Zkontrolujte, že historie byla vytvořena
         print(f"Historie operace byla vytvořena: {historie}")
 
-        # Smazání produktu
-        produkt.delete()
+        # Nastavení množství na 0 místo smazání
+        produkt.mnozstvi = 0
+        produkt.save()
 
-        # Přesměrování na hlavní stránku po úspěšném smazání
-        messages.success(request, f"Produkt {produkt.nazev} byl úspěšně smazán.")
+        # Přidání zprávy o úspěchu
+        messages.success(request, f"Produkt {produkt.nazev} byl označen jako není skladem.")
         return redirect('/')
 
     return render(request, 'sklad/smazat_produkt.html', {'produkt': produkt})

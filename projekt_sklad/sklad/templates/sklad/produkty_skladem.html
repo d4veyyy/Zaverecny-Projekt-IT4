@@ -1,0 +1,66 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<!-- Přidání odkazu na CSS soubor přímo sem -->
+{% load static %}
+<link rel="stylesheet" href="../../static/css/style.css">
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Produkty skladem</h1>
+    {% if produkty %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Název</th>
+                    <th>Popis</th>
+                    <th>Množství</th>
+                    <th>Cena</th>
+                    <th>Poslední uživatel</th>
+                    <th>Stav</th>
+                    <th>Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produkt in produkty %}
+                <tr>
+                    <td>{{ produkt.nazev }}</td>
+                    <td>{{ produkt.popis }}</td>
+                    <td>{{ produkt.mnozstvi }}</td>
+                    <td>{{ produkt.cena }} Kč</td>
+                    <td>
+                        {% if produkt.uzivatel %}
+                        {{ produkt.uzivatel.username }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                    {% if produkt.mnozstvi > 0 %}
+                        <span style="background-color: #28a745; color: white; padding: 5px 10px; border-radius: 15px;">Skladem</span>
+                            {% else %}
+                        <span style="background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 15px;">Není skladem</span>
+                            {% endif %}
+                    </td>
+                    <td>
+                        <form action="{% url 'pridat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-plus"></i> Přidat
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">Žádné produkty nejsou k dispozici.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+
+
