@@ -90,6 +90,15 @@ def pridat_produkt(request):
 def produkty_skladem(request):
     produkty = Produkt.objects.all()  # Získání všech produktů
 
+    # Filtrování podle ceny
+    min_cena = request.GET.get('min_cena')
+    max_cena = request.GET.get('max_cena')
+
+    if min_cena:
+        produkty = produkty.filter(cena__gte=min_cena)
+    if max_cena:
+        produkty = produkty.filter(cena__lte=max_cena)
+
     if request.method == 'POST':
         produkt_id = request.POST.get('produkt_id')
         mnozstvi = int(request.POST.get('mnozstvi', 0))  # Získání zadaného množství

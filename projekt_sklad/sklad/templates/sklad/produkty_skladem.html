@@ -1,13 +1,44 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-<!-- Přidání odkazu na CSS soubor přímo sem -->
-{% load static %}
-<link rel="stylesheet" href="../../static/css/style.css">
-
-<div class="container mt-5">
+<div class="container mt-4">
     <h1 class="text-center mb-4">Produkty skladem</h1>
-    {% if produkty %}
+
+    <!-- Tlačítko pro otevření filtru -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#filterModal">
+        🔍 Otevřít filtr
+    </button>
+
+    <!-- Modální okno pro filtr -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Filtr produktů</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="GET" action="{% url 'produkty_skladem' %}">
+                        <div class="mb-3">
+                            <label for="nazev" class="form-label">Název produktu</label>
+                            <input type="text" class="form-control" id="nazev" name="nazev" placeholder="Zadejte název">
+                        </div>
+                        <div class="mb-3">
+                            <label for="min_cena" class="form-label">Minimální cena</label>
+                            <input type="number" class="form-control" id="min_cena" name="min_cena" placeholder="Od">
+                        </div>
+                        <div class="mb-3">
+                            <label for="max_cena" class="form-label">Maximální cena</label>
+                            <input type="number" class="form-control" id="max_cena" name="max_cena" placeholder="Do">
+                        </div>
+                        <button type="submit" class="btn btn-success">Filtrovat</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabulka s produkty -->
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="thead-dark">
@@ -55,12 +86,5 @@
             </tbody>
         </table>
     </div>
-    {% else %}
-    <p class="text-center">Žádné produkty nejsou k dispozici.</p>
-    {% endif %}
 </div>
-
 {% endblock %}
-
-
-

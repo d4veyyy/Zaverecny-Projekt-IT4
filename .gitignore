@@ -1,0 +1,27 @@
+venv
+.idea/
+.vscode/
+*.iml
+db.sqlite3
+*.sqlite3
+*.log
+config.json
+secrets.json
+# Systémové soubory
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Virtuální prostředí
+venv/
+.env
+.venv/
+env/
+*.env
+Pipfile
+Pipfile.lock

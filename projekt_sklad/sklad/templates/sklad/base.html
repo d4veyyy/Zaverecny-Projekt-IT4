@@ -15,19 +15,15 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">📦 Sklad</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/">Domů</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/produkty_skladem/">📋 Produkty skladem</a>
-                    </li>
+            <a class="navbar-brand fw-bold" href="/">Sklad</a>
+
+            <!-- Tlačítko pro menu -->
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Menu
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="/produkty_skladem/">📦 Správa produktů</a></li>
                 </ul>
             </div>
         </div>
