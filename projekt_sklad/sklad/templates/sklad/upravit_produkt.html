@@ -1,12 +1,46 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-<div class="container">
-  <h1>Upravit produkt</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Uložit změny</button>
-  </form>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="fas fa-edit"></i> Upravit produkt: {{ produkt.nazev }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Název produktu</label>
+                    {{ form.nazev }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Popis</label>
+                    {{ form.popis }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Cena</label>
+                    {{ form.cena }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Množství</label>
+                    {{ form.mnozstvi }}
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'produkty_skladem' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Zpět
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Uložit změny
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
+

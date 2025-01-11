@@ -9,7 +9,23 @@
         🔍 Otevřít filtr
     </button>
 
-    <!-- Modální okno pro filtr -->
+    <!-- Zobrazení aktivních filtrů -->
+    {% if aktivni_filtry %}
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Aktivní filtry:</strong>
+            <ul class="mb-0">
+                {% for nazev, hodnota in aktivni_filtry.items %}
+                <li>{{ nazev }}: {{ hodnota }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Tlačítko pro resetování filtrů -->
+        <a href="{% url 'produkty_skladem' %}" class="btn btn-danger">Vymazat filtry</a>
+    </div>
+    {% endif %}
+
+    <!-- Filtr -->
     <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -21,15 +37,15 @@
                     <form method="GET" action="{% url 'produkty_skladem' %}">
                         <div class="mb-3">
                             <label for="nazev" class="form-label">Název produktu</label>
-                            <input type="text" class="form-control" id="nazev" name="nazev" placeholder="Zadejte název">
+                            <input type="text" class="form-control" id="nazev" name="nazev" placeholder="Zadejte název" value="{{ request.GET.nazev }}">
                         </div>
                         <div class="mb-3">
                             <label for="min_cena" class="form-label">Minimální cena</label>
-                            <input type="number" class="form-control" id="min_cena" name="min_cena" placeholder="Od">
+                            <input type="number" class="form-control" id="min_cena" name="min_cena" placeholder="Od" value="{{ request.GET.min_cena }}">
                         </div>
                         <div class="mb-3">
                             <label for="max_cena" class="form-label">Maximální cena</label>
-                            <input type="number" class="form-control" id="max_cena" name="max_cena" placeholder="Do">
+                            <input type="number" class="form-control" id="max_cena" name="max_cena" placeholder="Do" value="{{ request.GET.max_cena }}">
                         </div>
                         <button type="submit" class="btn btn-success">Filtrovat</button>
                     </form>
@@ -38,53 +54,56 @@
         </div>
     </div>
 
-    <!-- Tabulka s produkty -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Název</th>
-                    <th>Popis</th>
-                    <th>Množství</th>
-                    <th>Cena</th>
-                    <th>Poslední uživatel</th>
-                    <th>Stav</th>
-                    <th>Akce</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for produkt in produkty %}
-                <tr>
-                    <td>{{ produkt.nazev }}</td>
-                    <td>{{ produkt.popis }}</td>
-                    <td>{{ produkt.mnozstvi }}</td>
-                    <td>{{ produkt.cena }} Kč</td>
-                    <td>
-                        {% if produkt.uzivatel %}
-                        {{ produkt.uzivatel.username }}
+    <!-- Produkty ve formě karet -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+        {% for produkt in produkty %}
+        <div class="col">
+            <div class="card h-100 position-relative">
+                <!-- Obrázek produktu -->
+                {% if produkt.obrazek and produkt.obrazek.url %}
+                <img src="{{ produkt.obrazek.url }}" class="card-img-top" alt="{{ produkt.nazev }}">
+                {% else %}
+                <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="{{ produkt.nazev }}">
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ produkt.nazev }}</h5>
+                    <p class="card-text">{{ produkt.popis }}</p>
+                    <p class="card-text"><strong>Cena:</strong> {{ produkt.cena }} Kč</p>
+                    <p class="card-text"><strong>Množství:</strong> {{ produkt.mnozstvi }}</p>
+                    <p class="card-text">
+                        <strong>Stav:</strong>
+                        {% if produkt.mnozstvi > 0 %}
+                        <span class="badge bg-success">Skladem</span>
                         {% else %}
-                        -
+                        <span class="badge bg-danger">Není skladem</span>
                         {% endif %}
-                    </td>
-                    <td>
-                    {% if produkt.mnozstvi > 0 %}
-                        <span style="background-color: #28a745; color: white; padding: 5px 10px; border-radius: 15px;">Skladem</span>
-                            {% else %}
-                        <span style="background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 15px;">Není skladem</span>
-                            {% endif %}
-                    </td>
-                    <td>
-                        <form action="{% url 'pridat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success">
-                                <i class="fas fa-plus"></i> Přidat
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    </p>
+                </div>
+
+                <!-- Tlačítka pro akce v pravém dolním rohu -->
+                <div class="card-footer bg-transparent border-0 position-absolute bottom-0 end-0 d-flex flex-column align-items-end">
+                    <form action="{% url 'pridat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success mb-1">
+                            <i class="fas fa-plus"></i> +
+                        </button>
+                    </form>
+
+                    <form action="{% url 'odebrat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger mb-1">
+                            <i class="fas fa-minus"></i> -
+                        </button>
+                    </form>
+
+                    <a href="{% url 'upravit_produkt' produkt.id %}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Upravit
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

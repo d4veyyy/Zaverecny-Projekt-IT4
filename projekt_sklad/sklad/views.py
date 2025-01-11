@@ -34,24 +34,15 @@ def detail_produktu(request, id):
     # Vrátíme detail produktu do šablony
     return render(request, 'sklad/detail.html', {'produkt': produkt})
 
-def upravit_produkt(request, id):
-    produkt = Produkt.objects.get(id=id)
+def upravit_produkt(request, produkt_id):
+    produkt = get_object_or_404(Produkt, id=produkt_id)
+
     if request.method == 'POST':
         form = ProduktForm(request.POST, instance=produkt)
         if form.is_valid():
-            upravene_mnozstvi = form.cleaned_data['mnozstvi'] - produkt.mnozstvi
-            produkt = form.save()
-
-            # Záznam historie pro upravené množství
-            HistorieOperaci.objects.create(
-                produkt=produkt,
-                uzivatel=request.user,
-                typ_operace='příjem' if upravene_mnozstvi > 0 else 'výdej',
-                mnozstvi=abs(upravene_mnozstvi),
-                produkt_nazev=produkt.nazev
-            )
-
-            return redirect('produkty')
+            form.save()
+            messages.success(request, f"Produkt {produkt.nazev} byl úspěšně aktualizován.")
+            return redirect('produkty_skladem')
     else:
         form = ProduktForm(instance=produkt)
 
@@ -61,7 +52,8 @@ def upravit_produkt(request, id):
 
 def pridat_produkt(request):
     if request.method == 'POST':
-        form = ProduktForm(request.POST)
+        # Přidání request.FILES pro zpracování obrázků
+        form = ProduktForm(request.POST, request.FILES)
         if form.is_valid():
             produkt = form.save(commit=False)
             produkt.uzivatel = request.user  # Nastavení aktuálního uživatele
@@ -70,6 +62,7 @@ def pridat_produkt(request):
             # Debugovací výstupy
             print("Ukládám produkt:", produkt.nazev)
             print("Množství produktu:", produkt.mnozstvi)
+            print("Obrázek uložen na:", produkt.obrazek.url if produkt.obrazek else "Žádný obrázek nebyl nahrán.")
 
             # Automatické vytvoření historie operací
             HistorieOperaci.objects.create(
@@ -90,17 +83,28 @@ def pridat_produkt(request):
 def produkty_skladem(request):
     produkty = Produkt.objects.all()  # Získání všech produktů
 
+    # Inicializace aktivních filtrů
+    aktivni_filtry = {}
+
+    # Filtrování podle názvu
+    nazev = request.GET.get('nazev', '').strip()
+    if nazev:
+        produkty = produkty.filter(nazev__icontains=nazev)
+        aktivni_filtry['Název'] = nazev
+
     # Filtrování podle ceny
     min_cena = request.GET.get('min_cena')
     max_cena = request.GET.get('max_cena')
-
     if min_cena:
         produkty = produkty.filter(cena__gte=min_cena)
+        aktivni_filtry['Minimální cena'] = f"{min_cena} Kč"
     if max_cena:
         produkty = produkty.filter(cena__lte=max_cena)
+        aktivni_filtry['Maximální cena'] = f"{max_cena} Kč"
 
+    # Manipulace s množstvím při POST požadavku
     if request.method == 'POST':
-        produkt_id = request.POST.get('produkt_id')
+        produkt_id = request.POST.get('produkt_id')  # Získání ID produktu
         mnozstvi = int(request.POST.get('mnozstvi', 0))  # Získání zadaného množství
         produkt = get_object_or_404(Produkt, id=produkt_id)
 
@@ -112,7 +116,11 @@ def produkty_skladem(request):
         messages.success(request, f"Produkt {produkt.nazev} byl aktualizován. Nové množství: {produkt.mnozstvi}.")
         return redirect('produkty_skladem')
 
-    return render(request, 'sklad/produkty_skladem.html', {'produkty': produkty})
+    # Předání produktů a aktivních filtrů do šablony
+    return render(request, 'sklad/produkty_skladem.html', {
+        'produkty': produkty,
+        'aktivni_filtry': aktivni_filtry,
+    })
 
 
 def pridat_mnozstvi(request, produkt_id):
@@ -140,6 +148,38 @@ def pridat_mnozstvi(request, produkt_id):
 
     # Přesměrování zpět na stránku produktů skladem
     return redirect('produkty_skladem')  # Tady se ujistíme, že jdeš zpět na správnou stránku
+
+
+    #Odebrání jednoho kusu množství z produktu a zapsání operace do historie jako výdej.
+def odebrat_mnozstvi(request, produkt_id):
+    # Získání produktu podle ID
+    produkt = get_object_or_404(Produkt, id=produkt_id)
+
+    # Ověření, zda lze odebrat množství
+    if produkt.mnozstvi > 0:
+        # Odebrání jednoho kusu
+        produkt.mnozstvi -= 1
+        produkt.save()
+
+        # Získání uživatele (pokud je přihlášený)
+        uzivatel = request.user if request.user.is_authenticated else None
+
+        # Zapsání operace do historie jako výdej
+        HistorieOperaci.objects.create(
+            produkt=produkt,  # Odkaz na produkt
+            typ_operace='výdej',  # Typ operace - Výdej
+            mnozstvi=1,  # Odebrání 1 kusu
+            uzivatel=uzivatel  # Pokud je přihlášený uživatel, použij ho
+        )
+
+        # Zobrazení úspěšné zprávy
+        messages.success(request, f"Z produktu {produkt.nazev} byl odebrán 1 kus.")
+    else:
+        # Pokud je množství 0, zobrazí chybu
+        messages.error(request, f"Nelze odebrat množství. Produkt {produkt.nazev} je již na nule.")
+
+    # Přesměrování zpět na stránku s produkty
+    return redirect('produkty_skladem')
 
 def smazat_produkt(request, id):
     try:

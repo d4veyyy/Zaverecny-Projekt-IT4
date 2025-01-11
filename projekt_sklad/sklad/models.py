@@ -8,6 +8,7 @@ class Produkt(models.Model):
     mnozstvi = models.PositiveIntegerField()
     min_zasoba = models.PositiveIntegerField(default=0)
     uzivatel = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)  # Cizí klíč na uživatele
+    obrazek = models.ImageField(upload_to='produkty_obrazky/', blank=True, null=True)  # Pole pro obrázky
 
     def aktualizovat_stav(self):
         if self.mnozstvi > 0:

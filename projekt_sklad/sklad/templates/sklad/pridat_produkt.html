@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <div class="card shadow-sm p-4">
         <h1 class="text-center mb-4">Přidat nový produkt</h1>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data"> <!-- Přidáno enctype -->
             {% csrf_token %}
 
             <!-- Iterace přes pole formuláře a aplikování Bootstrap tříd -->
@@ -28,5 +28,6 @@
     </div>
 </div>
 {% endblock %}
+
 
 

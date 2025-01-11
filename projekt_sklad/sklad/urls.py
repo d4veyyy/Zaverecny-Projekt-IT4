@@ -1,12 +1,14 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index, name='index'),
     path('pridat_produkty/', views.pridat_produkt, name='pridat_produkty'),
     path('produkt/<int:id>/', views.detail_produktu, name='detail_produktu'),
-    path('upravit_produkt/<int:id>/', views.upravit_produkt, name='upravit_produkt'),
+    path('upravit_produkt/<int:produkt_id>/', views.upravit_produkt, name='upravit_produkt'),
     path('pridat/', views.pridat_produkt, name='pridat'),  # Změněný název
     path('historie/', views.historie_operaci, name='historie_operaci'),
     path('produkty/', views.produkty, name='produkty'),
@@ -17,5 +19,5 @@ urlpatterns = [
     path('smazat_produkt/<int:id>/', views.smazat_produkt, name='smazat_produkt'),
     path('produkty_skladem/', views.produkty_skladem, name='produkty_skladem'),
     path('pridat_mnozstvi/<int:produkt_id>/', views.pridat_mnozstvi, name='pridat_mnozstvi'),
-]
-
+    path('odebrat_mnozstvi/<int:produkt_id>/', views.odebrat_mnozstvi, name='odebrat_mnozstvi'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

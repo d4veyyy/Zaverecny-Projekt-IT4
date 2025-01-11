@@ -4,12 +4,20 @@ from .models import Produkt, HistorieOperaci
 class ProduktForm(forms.ModelForm):
     class Meta:
         model = Produkt
-        fields = ['nazev', 'popis', 'cena', 'mnozstvi', 'min_zasoba', 'uzivatel']  # Uživatele nebudeme vybírat, přidáme ho automaticky
+        fields = ['nazev', 'popis', 'cena', 'mnozstvi', 'min_zasoba', 'obrazek']  # Přidáno pole 'obrazek'
+        widgets = {
+            'obrazek': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)  # Uložíme request, abychom mohli přistupovat k uživateli
+        super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
         produkt = super().save(commit=False)
+        if self.request and self.request.user:
+            produkt.uzivatel = self.request.user  # Automatické přiřazení uživatele
         if commit:
-            produkt.uzivatel = self.request.user  # Nastavení uživatele při uložení
             produkt.save()
         return produkt
 
