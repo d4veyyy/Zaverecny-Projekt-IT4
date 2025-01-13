@@ -5,6 +5,7 @@ from django.db.models import Exists, OuterRef
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.contrib import messages
+from django.utils.dateparse import parse_datetime
 
 @login_required
 def index(request):
@@ -207,6 +208,21 @@ def smazat_produkt(request, id):
 def historie_operaci(request):
     # Načteme všechny operace z historie
     historie = HistorieOperaci.objects.all()
+
+    # Získání parametrů filtrování z GET requestu
+    od_datum = request.GET.get('od_datum')  # Parametr 'od_datum' z GET
+    do_datum = request.GET.get('do_datum')  # Parametr 'do_datum' z GET
+
+    # Filtrování podle zadaných dat
+    if od_datum:
+        od_datum_parsed = parse_datetime(od_datum)  # Převod na datetime objekt
+        if od_datum_parsed:
+            historie = historie.filter(datum__gte=od_datum_parsed)  # Filtrovat záznamy po zadaném datu
+
+    if do_datum:
+        do_datum_parsed = parse_datetime(do_datum)  # Převod na datetime objekt
+        if do_datum_parsed:
+            historie = historie.filter(datum__lte=do_datum_parsed)  # Filtrovat záznamy do zadaného data
 
     # Vrátíme historii operací do šablony
     return render(request, 'sklad/historie.html', {'historie': historie})

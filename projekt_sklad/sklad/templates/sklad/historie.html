@@ -3,47 +3,98 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="text-center mb-4">Historie operací</h1>
-    <a href="{% url 'odebrat_operace' %}" class="btn btn-warning">Odebrat historii</a>
+
+    <!-- Aktivní filtry -->
+    {% if request.GET.od_datum or request.GET.do_datum %}
+    <div class="alert alert-info d-inline-block mb-3">
+        <strong>Aktivní filtry:</strong>
+        <ul class="mb-0">
+            {% if request.GET.od_datum %}
+            <li>Od: {{ request.GET.od_datum }}</li>
+            {% endif %}
+            {% if request.GET.do_datum %}
+            <li>Do: {{ request.GET.do_datum }}</li>
+            {% endif %}
+        </ul>
+        <!-- Tlačítko na smazání filtrů -->
+        <a href="{% url 'historie_operaci' %}" class="btn btn-secondary btn-sm mt-2">Smazat filtry</a>
+    </div>
+    {% endif %}
+
+    <!-- Tlačítka -->
+    <div class="d-flex mb-3">
+        <a href="{% url 'odebrat_operace' %}" class="btn btn-warning me-2">Odebrat historii</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+            🔍 Filtrovat historii
+        </button>
+    </div>
+
     {% if historie %}
         <!-- Tabulka s historií operací -->
         <div class="table-responsive shadow-sm rounded">
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th scope="col"><i class="fas fa-calendar-alt"></i> Datum</th>
-                        <th scope="col"><i class="fas fa-box"></i> Produkt</th>
-                        <th scope="col"><i class="fas fa-exchange-alt"></i> Typ operace</th>
-                        <th scope="col"><i class="fas fa-sort-amount-up"></i> Množství</th>
-                        <th scope="col"><i class="fas fa-user"></i> Uživatel</th>
+                        <th scope="col">Datum</th>
+                        <th scope="col">Produkt</th>
+                        <th scope="col">Typ operace</th>
+                        <th scope="col">Množství</th>
+                        <th scope="col">Uživatel</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for operace in historie %}
-                        <tr>
-                            <td class="text-muted">{{ operace.datum|date:"d.m.Y H:i" }}</td>
-                            <td><strong>{{ operace.produkt.nazev }}</strong></td>
-                            <td>
-                                {% if operace.typ_operace == 'příjem' %}
-                                    <span class="badge bg-success"><i class="fas fa-plus-circle"></i> {{ operace.typ_operace }}</span>
-                                {% elif operace.typ_operace == 'výdej' %}
-                                    <span class="badge bg-danger"><i class="fas fa-minus-circle"></i> {{ operace.typ_operace }}</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">{{ operace.typ_operace }}</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ operace.mnozstvi }}</td>
-                            <td>{{ operace.uzivatel.username|default:"-" }}</td>
-                        </tr>
+                    <tr>
+                        <td class="text-muted">{{ operace.datum|date:"d.m.Y H:i" }}</td>
+                        <td><strong>{{ operace.produkt.nazev }}</strong></td>
+                        <td>
+                            {% if operace.typ_operace == 'příjem' %}
+                            <span class="badge bg-success">{{ operace.typ_operace }}</span>
+                            {% elif operace.typ_operace == 'výdej' %}
+                            <span class="badge bg-danger">{{ operace.typ_operace }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ operace.typ_operace }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ operace.mnozstvi }}</td>
+                        <td>{{ operace.uzivatel.username }}</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <!-- Zpráva o prázdné historii -->
         <div class="alert alert-warning text-center mt-4">
             <i class="fas fa-exclamation-circle"></i> Žádné operace nejsou k dispozici.
         </div>
     {% endif %}
 </div>
+
+<!-- Modal pro filtrování -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filtrovat historii</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body">
+                <form method="GET" action="{% url 'historie_operaci' %}">
+                    <div class="mb-3">
+                        <label for="od_datum" class="form-label">Od data a času</label>
+                        <input type="datetime-local" class="form-control" id="od_datum" name="od_datum" value="{{ request.GET.od_datum }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="do_datum" class="form-label">Do data a času</label>
+                        <input type="datetime-local" class="form-control" id="do_datum" name="do_datum" value="{{ request.GET.do_datum }}">
+                    </div>
+                    <button type="submit" class="btn btn-success">Filtrovat</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+
 
