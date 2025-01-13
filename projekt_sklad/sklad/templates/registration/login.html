@@ -1,6 +1,28 @@
-<h1>Přihlášení</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Přihlásit</button>
-</form>
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg border-0" style="width: 400px; border-radius: 15px;">
+        <div class="card-body">
+            <h2 class="text-center mb-3 text-primary fw-bold">Přihlášení</h2>
+            <p class="text-center text-muted mb-4">Vítejte zpět! Přihlaste se ke svému účtu.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Uživatel</label>
+                    {{ form.username }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Heslo</label>
+                    {{ form.password }}
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2"> Přihlásit se</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{% url 'reset_password' %}" class="text-decoration-none text-danger">Zapomněli jste heslo?</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,45 @@
+{% extends 'sklad/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="row g-0">
+            <!-- Obrázek produktu -->
+            <div class="col-md-6">
+                {% if produkt.obrazek and produkt.obrazek.url %}
+                <img src="{{ produkt.obrazek.url }}" class="img-fluid rounded-start" alt="{{ produkt.nazev }}">
+                {% else %}
+                <img src="https://via.placeholder.com/600x400" class="img-fluid rounded-start" alt="{{ produkt.nazev }}">
+                {% endif %}
+            </div>
+            <!-- Detaily produktu -->
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h1 class="card-title text-primary fw-bold">{{ produkt.nazev }}</h1>
+                    <p class="card-text text-muted">{{ produkt.popis }}</p>
+                    <hr>
+                    <h4><strong>Cena:</strong> <span class="text-success">{{ produkt.cena }} Kč</span></h4>
+                    <h5><strong>Množství:</strong> <span class="text-dark">{{ produkt.mnozstvi }}</span></h5>
+                    <p>
+                        <strong>Stav:</strong>
+                        {% if produkt.mnozstvi > 0 %}
+                        <span class="badge bg-success">Skladem</span>
+                        {% else %}
+                        <span class="badge bg-danger">Není skladem</span>
+                        {% endif %}
+                    </p>
+                    <div class="mt-4">
+                        <!-- Tlačítka -->
+                        <a href="{% url 'produkty_skladem' %}" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left"></i> Zpět na seznam
+                        </a>
+                        <a href="{% url 'upravit_produkt' produkt.id %}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Upravit produkt
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

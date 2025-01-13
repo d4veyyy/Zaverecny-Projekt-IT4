@@ -4,9 +4,13 @@ from .models import Produkt, HistorieOperaci
 class ProduktForm(forms.ModelForm):
     class Meta:
         model = Produkt
-        fields = ['nazev', 'popis', 'cena', 'mnozstvi', 'min_zasoba', 'obrazek']  # Přidáno pole 'obrazek'
+        fields = ['nazev', 'cena', 'popis', 'mnozstvi', 'obrazek']
         widgets = {
-            'obrazek': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'nazev': forms.TextInput(attrs={'class': 'form-control'}),
+            'cena': forms.NumberInput(attrs={'class': 'form-control'}),
+            'popis': forms.Textarea(attrs={'class': 'form-control'}),
+            'mnozstvi': forms.NumberInput(attrs={'class': 'form-control'}),
+            'obrazek': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -1,22 +1,62 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-<div class="container">
-    <h1>Odebrat všechny produkty</h1>
+<div class="container my-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-gradient bg-danger text-white text-center rounded-top">
+            <h3 class="mb-0">
+                <i class="fas fa-trash"></i> Odebrat produkty
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <p class="text-danger fw-bold">Vyberte produkty, které chcete smazat, nebo zvolte možnost smazání všech produktů. Tato akce je nevratná!</p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <p>Opravdu chcete smazat všechny produkty? Tato akce je nevratná!</p>
-        <button type="submit" class="btn btn-danger">Ano, smazat všechny produkty</button>
-        <a href="{% url 'index' %}" class="btn btn-secondary">Zrušit</a>
-    </form>
+                <!-- Seznam produktů s možností výběru -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Seznam produktů:</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="select_all" onclick="toggleSelection(this)">
+                        <label class="form-check-label fw-bold text-primary" for="select_all">Vybrat všechny</label>
+                    </div>
+                    <hr>
+                    {% for produkt in produkty %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="produkty" value="{{ produkt.id }}" id="produkt_{{ produkt.id }}">
+                        <label class="form-check-label" for="produkt_{{ produkt.id }}">
+                            {{ produkt.nazev }} ({{ produkt.mnozstvi }})
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
 
-    <h3>Seznam produktů k smazání:</h3>
-    <ul>
-        {% for produkt in produkty %}
-        <li>{{ produkt.nazev }} ({{ produkt.mnozstvi }})</li>
-        {% endfor %}
-    </ul>
+                <!-- Akční tlačítka -->
+                <div class="text-center mt-4">
+                    <button type="submit" name="action" value="delete_selected" class="btn btn-danger px-4 me-3">
+                        <i class="fas fa-trash"></i> Odebrat vybrané produkty
+                    </button>
+                    <button type="submit" name="action" value="delete_all" class="btn btn-warning px-4">
+                        <i class="fas fa-trash-alt"></i> Odebrat všechny produkty
+                    </button>
+                    <a href="{% url 'index' %}" class="btn btn-secondary px-4">
+                        <i class="fas fa-arrow-left"></i> Zrušit
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- JavaScript pro funkci "Vybrat všechny" -->
+<script>
+function toggleSelection(source) {
+    const checkboxes = document.querySelectorAll('input[name="produkty"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = source.checked;
+    });
+}
+</script>
 {% endblock %}
+
 

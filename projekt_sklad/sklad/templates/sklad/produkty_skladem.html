@@ -3,11 +3,13 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="text-center mb-4">Produkty skladem</h1>
-
+    <a href="{% url 'pridat_produkty' %}" class="btn btn-primary me-2">Přidat produkt</a>
+    <a href="{% url 'odebrat_produkty' %}" class="btn btn-danger me-2">Odebrat produkty</a>
     <!-- Tlačítko pro otevření filtru -->
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#filterModal">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
         🔍 Otevřít filtr
     </button>
+</div>
 
     <!-- Zobrazení aktivních filtrů -->
     {% if aktivni_filtry %}
@@ -55,20 +57,25 @@
     </div>
 
     <!-- Produkty ve formě karet -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
-        {% for produkt in produkty %}
-        <div class="col">
-            <div class="card h-100 position-relative">
-                <!-- Obrázek produktu -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+    {% for produkt in produkty %}
+    <div class="col">
+        <div class="card h-100">
+            <!-- Obrázek produktu jako odkaz na detail -->
+            <a href="{% url 'detail_produktu' produkt.id %}">
                 {% if produkt.obrazek and produkt.obrazek.url %}
                 <img src="{{ produkt.obrazek.url }}" class="card-img-top" alt="{{ produkt.nazev }}">
                 {% else %}
                 <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="{{ produkt.nazev }}">
                 {% endif %}
+            </a>
 
-                <div class="card-body">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div>
                     <h5 class="card-title">{{ produkt.nazev }}</h5>
                     <p class="card-text">{{ produkt.popis }}</p>
+                </div>
+                <div>
                     <p class="card-text"><strong>Cena:</strong> {{ produkt.cena }} Kč</p>
                     <p class="card-text"><strong>Množství:</strong> {{ produkt.mnozstvi }}</p>
                     <p class="card-text">
@@ -80,30 +87,33 @@
                         {% endif %}
                     </p>
                 </div>
+            </div>
 
-                <!-- Tlačítka pro akce v pravém dolním rohu -->
-                <div class="card-footer bg-transparent border-0 position-absolute bottom-0 end-0 d-flex flex-column align-items-end">
-                    <form action="{% url 'pridat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-success mb-1">
-                            <i class="fas fa-plus"></i> +
-                        </button>
-                    </form>
+            <!-- Tlačítka pro akce -->
+            <div class="card-footer d-flex justify-content-between">
+                <form action="{% url 'pridat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus"></i> +
+                    </button>
+                </form>
 
-                    <form action="{% url 'odebrat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger mb-1">
-                            <i class="fas fa-minus"></i> -
-                        </button>
-                    </form>
+                <form action="{% url 'odebrat_mnozstvi' produkt.id %}" method="POST" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="fas fa-minus"></i> -
+                    </button>
+                </form>
 
-                    <a href="{% url 'upravit_produkt' produkt.id %}" class="btn btn-sm btn-warning">
-                        <i class="fas fa-edit"></i> Upravit
-                    </a>
-                </div>
+                <a href="{% url 'upravit_produkt' produkt.id %}" class="btn btn-sm btn-warning">
+                    <i class="fas fa-edit"></i> Upravit
+                </a>
             </div>
         </div>
-        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
     </div>
 </div>
 {% endblock %}

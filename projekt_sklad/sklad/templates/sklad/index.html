@@ -1,153 +1,98 @@
 {% extends 'sklad/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="text-center mb-4">Přehled Produktů</h1>
-    <div class="mb-3">
-        <!-- Tlačítka pro přidání a odebrání produktů -->
-        <a href="{% url 'pridat_produkty' %}" class="btn btn-primary">Přidat produkt</a>
-        <a href="{% url 'odebrat_produkty' %}" class="btn btn-danger">Odebrat produkty</a>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Vítejte ve skladovém systému </h1>
+
+    <!-- Sekce rychlých odkazů -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <a href="{% url 'produkty_skladem' %}" class="btn btn-primary btn-lg w-100 mb-2">📦 Přehled produktů</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'sledovani_zasob' %}" class="btn btn-warning btn-lg w-100 mb-2">📊 Sledování zásob</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'historie_operaci' %}" class="btn btn-danger btn-lg w-100 mb-2">🕒 Historie operací</a>
+        </div>
     </div>
 
-    {% if produkty %}
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Název</th>
-                    <th>Popis</th>
-                    <th>Množství</th>
-                    <th>Cena</th> <!-- Přidán sloupec pro cenu -->
-                    <th>Přidal</th>
-                    <th>Stav</th>
-                    <th>Akce</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for produkt in produkty %}
-            <tr>
-                <td>{{ produkt.nazev }}</td>
-                <td>{{ produkt.popis }}</td>
-                <td>{{ produkt.mnozstvi }}</td>
-                <td>{{ produkt.cena }} Kč</td> <!-- Zobrazení ceny -->
-                <td>
-                    {% if produkt.uzivatel %}
-                    {{ produkt.uzivatel.username }}
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td>
-                    {% if produkt.mnozstvi > 0 %}
-                    <span class="badge skladem">Skladem</span>
-                    {% else %}
-                    <span class="badge neni-skladem">Není skladem</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'smazat_produkt' produkt.id %}" class="btn btn-danger btn-sm">Smazat</a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <!-- Sekce statistik -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card p-3 shadow">
+                <h4> Celkový počet produktů</h4>
+                <p class="display-4">{{ celkovy_pocet_produkty }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 shadow">
+                <h4> Produkty skladem</h4>
+                <p class="display-4">{{ pocet_skladem }}</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3 shadow">
+                <h4> Pohyby produktů</h4>
+                <p class="display-4">{{ pocet_neni_skladem }}</p>
+            </div>
+        </div>
     </div>
-    {% else %}
-    <p class="text-center">Žádné produkty nejsou k dispozici.</p>
+
+    <!-- Sekce upozornění -->
+    {% if nedostatek_zasob %}
+    <div class="alert alert-danger">
+        <h5><strong>⚠️ Upozornění:</strong> Některé produkty mají nedostatek zásob:</h5>
+        <ul>
+            {% for produkt in nedostatek_zasob %}
+            <li>{{ produkt.nazev }} (Množství: {{ produkt.mnozstvi }})</li>
+            {% endfor %}
+        </ul>
+    </div>
     {% endif %}
 
-    <h2 class="text-center mb-4">Přehled Historie</h2>
-    <a href="{% url 'odebrat_operace' %}" class="btn btn-warning">Odebrat historii</a>
 
-    {% if historie %}
-    <div class="table-responsive mt-3">
-        <table class="table table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Datum</th>
-                    <th>Produkt</th>
-                    <th>Uživatel</th>
-                    <th>Typ operace</th>
-                    <th>Množství</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for operace in historie %}
-            <tr>
-                <td>{{ operace.datum|date:"d.m.Y H:i" }}</td>
-                <td>{{ operace.produkt_nazev }}</td>
-                <td>{{ operace.uzivatel.username }}</td>
-                <td>{{ operace.typ_operace }}</td>
-                <td>{{ operace.mnozstvi }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <!-- Ilustrační obrázek -->
+    <div class="text-center mt-5">
+        <img src="media/uvodni_obrazek/uvodni obrazek.webp" alt="Ilustrační obrázek" class="img-fluid rounded shadow">
     </div>
-    {% else %}
-    <p class="text-center">Žádné operace nejsou k dispozici.</p>
-    {% endif %}
 </div>
 
 <style>
-    /* Styling pro Stav skladem a Není skladem */
-    .skladem {
-        background-color: #28a745;  /* Zelená barva */
-        color: white;
-        padding: 5px 10px;
+    /* Přizpůsobení vzhledu tlačítek a statistik */
+    .btn-lg {
+        font-size: 1.2rem;
+    }
+
+    .card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
         border-radius: 10px;
     }
 
-    .neni-skladem {
-        background-color: #dc3545;  /* Červená barva */
-        color: white;
-        padding: 5px 10px;
-        border-radius: 10px;
+    .card h4 {
+        color: #333;
     }
 
-    .badge {
-        font-size: 0.85rem;
+    .display-4 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #28a745;
     }
 
-    /* Styling pro tlačítka */
-    .btn-primary {
-        background-color: #58aa60;
-        border-color: #000000;
-        color: black;
+    .alert h5 {
+        margin: 0;
     }
 
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #000000;
+    /* Styl obrázku */
+    img.img-fluid {
+        max-width: 100%;
+        height: auto;
     }
 
-    .btn-warning {
-        background-color: #ff0000;
-        border-color: #000000;
-        color: #ffffff;
-    }
-
-    /* Vylepšený design tabulky */
-    table {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    th, td {
-        text-align: center;
-    }
-
-    th {
-        color: #000000;
-    }
-
-    tr:nth-child(odd) {
-        background-color: #f2f2f2;
-    }
-
-    tr:hover {
-        background-color: #e9ecef;
+    .img-fluid {
+        margin-top: 30px;
     }
 </style>
-
 {% endblock %}
+

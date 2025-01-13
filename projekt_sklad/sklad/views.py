@@ -28,24 +28,18 @@ def index(request):
 
 
 def detail_produktu(request, id):
-    # Načteme produkt podle ID
-    produkt = get_object_or_404(Produkt, pk=id)
-
-    # Vrátíme detail produktu do šablony
-    return render(request, 'sklad/detail.html', {'produkt': produkt})
+    produkt = get_object_or_404(Produkt, id=id)
+    return render(request, 'sklad/detail_produktu.html', {'produkt': produkt})
 
 def upravit_produkt(request, produkt_id):
-    produkt = get_object_or_404(Produkt, id=produkt_id)
-
+    produkt = get_object_or_404(Produkt, pk=produkt_id)
     if request.method == 'POST':
-        form = ProduktForm(request.POST, instance=produkt)
+        form = ProduktForm(request.POST, request.FILES, instance=produkt)
         if form.is_valid():
             form.save()
-            messages.success(request, f"Produkt {produkt.nazev} byl úspěšně aktualizován.")
             return redirect('produkty_skladem')
     else:
         form = ProduktForm(instance=produkt)
-
     return render(request, 'sklad/upravit_produkt.html', {'form': form, 'produkt': produkt})
 
 
@@ -81,7 +75,7 @@ def pridat_produkt(request):
     return render(request, 'sklad/pridat_produkt.html', {'form': form})
 
 def produkty_skladem(request):
-    produkty = Produkt.objects.all()  # Získání všech produktů
+    produkty = Produkt.objects.all()
 
     # Inicializace aktivních filtrů
     aktivni_filtry = {}
@@ -217,49 +211,50 @@ def historie_operaci(request):
     # Vrátíme historii operací do šablony
     return render(request, 'sklad/historie.html', {'historie': historie})
 
-
-def produkty(request):
-    # Načteme všechny produkty z databáze
-    produkty = Produkt.objects.all()
-
-    # Vrátíme produkty do šablony
-    return render(request, 'sklad/produkty.html', {'produkty': produkty})
-
-def pridat_historii(request):
-    if request.method == 'POST':
-        form = HistorieOperaciForm(request.POST)
-        if form.is_valid():
-            form.save()  # Uložení historie operace
-            return redirect('index')  # Přesměrování zpět na hlavní stránku
-    else:
-        form = HistorieOperaciForm()  # Inicializace formuláře pro historii operací
-
-    # Vrácení formuláře do šablony
-    return render(request, 'sklad/pridat_historii.html', {'form': form})
-
 def odebrat_produkty(request):
     if request.method == 'POST':
-        # Získání všech produktů
-        produkty = Produkt.objects.all()
+        action = request.POST.get("action")  # Zjištění, jaká akce byla odeslána (odebrat vybrané nebo všechny)
 
-        # Uložení historie operace pro každý produkt
-        for produkt in produkty:
-            HistorieOperaci.objects.create(
-                produkt=produkt,
-                uzivatel=request.user,
-                typ_operace='smazání',  # Pokud chcete označit jako 'smazání'
-                mnozstvi=produkt.mnozstvi,
-                produkt_nazev=produkt.nazev
-            )
+        if action == "delete_selected":
+            produkty_ids = request.POST.getlist("produkty")  # Získání ID vybraných produktů
+            produkty = Produkt.objects.filter(id__in=produkty_ids)
 
-        # Smazání všech produktů
-        produkty.delete()
+            # Uložení historie operace pro vybrané produkty
+            for produkt in produkty:
+                HistorieOperaci.objects.create(
+                    produkt=produkt,
+                    uzivatel=request.user,
+                    typ_operace='smazání',
+                    mnozstvi=produkt.mnozstvi,
+                    produkt_nazev=produkt.nazev
+                )
 
-        # Informování uživatele o úspěchu
-        messages.success(request, "Všechny produkty byly úspěšně smazány.")
-        return redirect('index')  # Přesměrování na hlavní stránku nebo jinou dle vašeho výběru
+            # Smazání vybraných produktů
+            produkty.delete()
+            messages.success(request, f"Vybrané produkty byly úspěšně smazány.")
 
-    produkty = Produkt.objects.all()  # Získání všech produktů pro případ, že chcete zobrazit seznam
+        elif action == "delete_all":
+            produkty = Produkt.objects.all()
+
+            # Uložení historie operace pro všechny produkty
+            for produkt in produkty:
+                HistorieOperaci.objects.create(
+                    produkt=produkt,
+                    uzivatel=request.user,
+                    typ_operace='smazání',
+                    mnozstvi=produkt.mnozstvi,
+                    produkt_nazev=produkt.nazev
+                )
+
+            # Smazání všech produktů
+            produkty.delete()
+            messages.success(request, "Všechny produkty byly úspěšně smazány.")
+
+        # Přesměrování na hlavní stránku nebo jinou dle vašeho výběru
+        return redirect('index')
+
+    # Pokud jde o GET požadavek, načteme všechny produkty pro zobrazení
+    produkty = Produkt.objects.all()
     return render(request, 'sklad/odebrat_produkty.html', {'produkty': produkty})
 
 def odebrat_operace(request):
@@ -282,3 +277,15 @@ def odebrat_operace(request):
         return redirect('index')  # Přesměrování na hlavní stránku
 
     return render(request, 'sklad/odebrat_operace.html')
+
+def sledovani_zasob(request):
+    # Získání všech produktů
+    produkty = Produkt.objects.all()
+
+    # Filtrace produktů, které mají nulové množství
+    produkty_nedostatek = produkty.filter(mnozstvi=0)
+
+    return render(request, 'sklad/sledovani_zasob.html', {
+        'produkty': produkty,
+        'produkty_nedostatek': produkty_nedostatek,
+    })
