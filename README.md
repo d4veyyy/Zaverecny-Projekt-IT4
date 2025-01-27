@@ -1,5 +1,7 @@
 # Webová aplikace – Správa skladu
 
+## Prezentační video : https://www.youtube.com/watch?v=PVYcGCyjjHU
+
 ## Popis projektu
 
 Tato webová aplikace je určena pro **správu skladových zásob** a umožňuje správu produktů ve skladu, jako je přidávání nových položek, aktualizace stavu zásob, jejich mazání a sledování historie pohybů. Aplikace je postavena pomocí **Django** na backendu, který generuje HTML šablony pro frontend, což umožňuje plnou integraci serverové logiky s uživatelským rozhraním.
